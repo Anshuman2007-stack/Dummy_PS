@@ -1,0 +1,20 @@
+# Tunable parameters. Values are the defaults that were hard-coded in the nodes.
+# Edit here (no rebuild needed with `colcon build --symlink-install`).
+
+ekf_node:
+  ros__parameters:
+    gps_sigma: 0.3          # m - must match the GPS noise in true_pose_gps.py (SIGMA)
+    gps_gate: 9.21          # chi-square gate, 2 dof, 99 %
+    gps_init_samples: 20    # fixes averaged to set the GPS origin (robot must be still)
+    use_imu_yaw: true       # fuse IMU orientation yaw as a heading measurement
+
+navigation_pid_node:
+  ros__parameters:
+    max_linear: 0.3         # m/s
+    max_angular: 1.0        # rad/s
+    goal_tol: 0.10          # m - goal reached when closer than this
+    steer_freeze: 0.15      # m - stop steering inside this radius (heading is noisy)
+    rotate_done: 0.08       # rad - switch ROTATE -> DRIVE below this heading error
+    rotate_again: 0.6       # rad - switch DRIVE -> ROTATE above this heading error
+    align_final: false      # also turn to the goal orientation at the end
+    align_tol: 0.08         # rad
