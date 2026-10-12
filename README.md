@@ -22,9 +22,9 @@ target `(x, y)` typed in by the user.
 ```
 ugv-ekf-navigation/
 ├── src/
-│   ├── my_bot_sim/        Stage 1  Gazebo world, robot model, bridge, true_pose_gps (GPS source)
-│   ├── ugv_nav/           Stage 2+3  ekf_node, navigation_pid_node, goal_pose_node, params
-│   └── ugv_bringup/       Stage 6  one launch file that starts everything
+│   ├── my_bot_sim/         Gazebo world, robot model, bridge, true_pose_gps (GPS source)
+│   ├── ugv_nav/            ekf_node, navigation_pid_node, goal_pose_node, params
+│   └── ugv_bringup/        one launch file that starts everything
 ├── scripts/               setup.sh · check_system.sh · kill_sim.sh
 ├── docs/                  architecture · maths · PID tuning · evaluation
 ├── README.md  LICENSE  .gitignore
@@ -32,12 +32,11 @@ ugv-ekf-navigation/
 
 | Stage | Package / file | Run on its own with |
 |---|---|---|
-| 1 Sensor interfaces | `my_bot_sim` | `ros2 launch my_bot_sim sim.launch.py` |
-| 2 EKF fusion | `ugv_nav/ekf_node.py` | `ros2 launch ugv_nav ekf.launch.py` |
-| 3 Target navigation | `ugv_nav/navigation_pid_node.py` | `ros2 launch ugv_nav navigation.launch.py` |
-| – Goal input (keyboard) | `ugv_nav/goal_pose_node.py` | `ros2 run ugv_nav goal_pose_node` |
-| 4 Kinematics, 5 wheel PID | *not implemented yet* – see [Project status](#project-status) | |
-| 6 End-to-end | `ugv_bringup` | `ros2 launch ugv_bringup full_system.launch.py` |
+| Sensor interfaces | `my_bot_sim` | `ros2 launch my_bot_sim sim.launch.py` |
+| EKF fusion | `ugv_nav/ekf_node.py` | `ros2 launch ugv_nav ekf.launch.py` |
+| Target navigation | `ugv_nav/navigation_pid_node.py` | `ros2 launch ugv_nav navigation.launch.py` |
+| Goal input (keyboard) | `ugv_nav/goal_pose_node.py` | `ros2 run ugv_nav goal_pose_node` |
+| End-to-end | `ugv_bringup` | `ros2 launch ugv_bringup full_system.launch.py` |
 
 ## 2. Requirements
 
@@ -254,11 +253,10 @@ Checked against the problem statement (Section 1.4):
 | 1 | Sensor interfaces | Done. Wheel odometry comes from Gazebo's DiffDrive plugin, not computed from raw encoder ticks. |
 | 2 | EKF fusion | Done: state `(x, y, θ, v, ω)`, wheel + gyro + IMU yaw + GPS with chi-square gating. |
 | 3 | Target navigation | Done: rotate → drive state machine with PID on heading and distance. |
-| 4 | Diff-drive kinematics (4 wheels) | **Missing.** `/cmd_vel` goes straight to Gazebo's DiffDrive plugin. |
-| 5 | Per-wheel PID with anti-windup | **Missing.** The only PID is the heading/distance one in the navigation node. |
-| 6 | Integration + TF | Launch files done. **No `odom → base_link` TF is published yet** (the EKF only publishes `Odometry`). |
+| 4 | Diff-drive kinematics (4 wheels) | ||
+| 5 | Per-wheel PID with anti-windup | ||
+| 6 | Integration + TF | Launch files done.|
 
-Also open: the model has two driven wheels plus casters (problem statement says four-wheel);
 GPS dropout, wheel slip and actuator saturation scenarios are not yet exercised;
 the evaluation results in `docs/evaluation.md` still have to be measured.
 
