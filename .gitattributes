@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+*.launch.py text eol=lf
+*.sdf text eol=lf
+*.md text eol=lf
+*.zip binary
