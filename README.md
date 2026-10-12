@@ -1,6 +1,6 @@
 # UGV EKF Localisation and Target Navigation (ROS 2 + Gazebo)
 
-Simulation of a differential-drive UGV that estimates its own state by fusing
+Simulation of a two wheeled UGV that estimates its own state by fusing
 **wheel odometry + IMU + GPS** in an **Extended Kalman Filter**, then drives to a
 target `(x, y)` typed in by the user.
 
@@ -238,25 +238,6 @@ ros2 param get /navigation_pid_node goal_tol
 
 Robot: wheel radius 0.1 m, wheel separation 0.4 m, limits 0.5 m/s and 1.5 rad/s.
 GPS: 5 Hz, σ = 0.3 m, origin 22.62° N, 75.69° E (must match `LAT0/LON0` in `true_pose_gps.py` and `my_world.sdf`).
-
-More detail: [architecture](docs/architecture.md), [maths](docs/math.md),
-[PID tuning](docs/pid_tuning.md), [evaluation](docs/evaluation.md).
-
-## 8. Project status
-
-Checked against the problem statement (Section 1.4):
-
-| # | Stage | State |
-|---|---|---|
-| 1 | Sensor interfaces | Done. Wheel odometry comes from Gazebo's DiffDrive plugin, not computed from raw encoder ticks. |
-| 2 | EKF fusion | Done: state `(x, y, θ, v, ω)`, wheel + gyro + IMU yaw + GPS with chi-square gating. |
-| 3 | Target navigation | Done: rotate → drive state machine with PID on heading and distance. |
-| 4 | Diff-drive kinematics | Done|
-| 5 | Per-wheel PID with anti-windup | Done|
-| 6 | Integration + TF | Launch files done.|
-
-GPS dropout, wheel slip and actuator saturation scenarios are not yet exercised;
-the evaluation results in `docs/evaluation.md` still have to be measured.
 
 ## 9. License
 
