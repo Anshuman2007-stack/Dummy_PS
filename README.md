@@ -251,8 +251,8 @@ Checked against the problem statement (Section 1.4):
 | 1 | Sensor interfaces | Done. Wheel odometry comes from Gazebo's DiffDrive plugin, not computed from raw encoder ticks. |
 | 2 | EKF fusion | Done: state `(x, y, θ, v, ω)`, wheel + gyro + IMU yaw + GPS with chi-square gating. |
 | 3 | Target navigation | Done: rotate → drive state machine with PID on heading and distance. |
-| 4 | Diff-drive kinematics | |Done|
-| 5 | Per-wheel PID with anti-windup | |Done|
+| 4 | Diff-drive kinematics | Done|
+| 5 | Per-wheel PID with anti-windup | Done|
 | 6 | Integration + TF | Launch files done.|
 
 GPS dropout, wheel slip and actuator saturation scenarios are not yet exercised;
