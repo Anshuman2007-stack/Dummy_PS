@@ -12,8 +12,6 @@ target `(x, y)` typed in by the user.
    /true_odom (ground truth)                       /goal_pose ◄── goal_pose_node (keyboard)
 ```
 
-> Status against the problem statement, and what is still missing, is listed in
-> [Project status](#project-status). Please read it before submitting.
 
 ---
 
