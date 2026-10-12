@@ -1,0 +1,25 @@
+# colcon
+build/
+install/
+log/
+
+# python
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+
+# editor / OS
+.vscode/
+.idea/
+*.swp
+*.save
+*~
+.DS_Store
+
+# data
+*.bag
+*.db3
+*.mcap
+rosbag2_*/
+*.zip
