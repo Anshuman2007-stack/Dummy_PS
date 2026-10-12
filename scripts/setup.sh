@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Install dependencies and build the workspace.
-# Usage (from repo root):  ./scripts/setup.sh [ros_distro]     e.g. ./scripts/setup.sh jazzy
+# Usage (from repo root):  ./scripts/setup.sh [ros_distro]     e.g. ./scripts/setup.sh humble
 set -euo pipefail
 
-ROS_DISTRO_NAME="${1:-${ROS_DISTRO:-jazzy}}"
+ROS_DISTRO_NAME="${1:-${ROS_DISTRO:-humble}}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 if [ ! -f "/opt/ros/${ROS_DISTRO_NAME}/setup.bash" ]; then

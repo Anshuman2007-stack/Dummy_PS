@@ -41,23 +41,26 @@ ugv-ekf-navigation/
 
 ## 2. Requirements
 
-* Ubuntu 24.04 + **ROS 2 Jazzy** + **Gazebo Harmonic** (the SDF uses `gz-sim-*` plugins and
-  `ros_gz_sim` launch files). Other combinations are untested.
-* `ros-jazzy-ros-gz` (provides `ros_gz_sim`, `ros_gz_bridge`), `python3-numpy`,
+* Ubuntu 22.04 + **ROS 2 Humble** + **Gazebo Fortress** (Ignition Gazebo 6). The SDF files use the
+  Fortress plugin names (`ignition-gazebo-*`) and the bridge uses `ignition.msgs.*` types.
+  This will **not** load on Garden/Harmonic without renaming them.
+* `ros-humble-ros-gz` (provides `ros_gz_sim`, `ros_gz_bridge`; pulls in Fortress), `python3-numpy`,
   `xterm` (for the goal-input window), `colcon`, `rosdep`.
 
 ## 3. Build (step by step)
 
 ```bash
-# 1. Install ROS 2 Jazzy + Gazebo: https://docs.ros.org/en/jazzy/Installation.html
-sudo apt install ros-jazzy-desktop ros-jazzy-ros-gz
+# 1. Install ROS 2 Humble: https://docs.ros.org/en/humble/Installation.html
+sudo apt install ros-humble-desktop ros-humble-ros-gz
+ign gazebo --version        # should print 6.x (Fortress). If 'ign' is missing, install ignition-fortress
+                            # from the OSRF apt repo: https://gazebosim.org/docs/fortress/install_ubuntu
 
 # 2. Get the code
 git clone https://github.com/<your-user>/ugv-ekf-navigation.git
 cd ugv-ekf-navigation
 
 # 3. Install dependencies and build (or run ./scripts/setup.sh)
-source /opt/ros/jazzy/setup.bash
+source /opt/ros/humble/setup.bash
 rosdep update
 rosdep install --from-paths src --ignore-src -r -y
 sudo apt install xterm
@@ -145,8 +148,8 @@ ros2 run rqt_graph rqt_graph              # visual node/topic graph
 ### Sensors (Stage 1)
 
 ```bash
-gz topic -l                               # topics inside Gazebo: /imu /navsat /model/my_bot/odometry /true_odom /cmd_vel
-gz topic -e -t /imu -n 1                  # one raw Gazebo IMU message
+ign topic -l                              # topics inside Gazebo: /imu /navsat /model/my_bot/odometry /true_odom /cmd_vel
+ign topic -e -t /imu -n 1                 # one raw Gazebo IMU message
 ros2 topic hz /odom/wheels                # ~50 Hz
 ros2 topic hz /imu/data                   # ~100 Hz
 ros2 topic hz /gnss/fix                   # ~5 Hz
@@ -161,7 +164,7 @@ Drive manually and confirm the sensors react (`Ctrl-C`, then send zeros to stop)
 ros2 topic pub -r 10 /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.2}, angular: {z: 0.0}}"   # straight
 ros2 topic pub -r 10 /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.0}, angular: {z: 0.5}}"   # spin
 ros2 topic pub --once /cmd_vel geometry_msgs/msg/Twist "{}"                                     # stop
-# keyboard alternative: sudo apt install ros-jazzy-teleop-twist-keyboard
+# keyboard alternative: sudo apt install ros-humble-teleop-twist-keyboard
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
 
@@ -174,7 +177,7 @@ ros2 topic echo /ekf/odom  --field pose.covariance                # shrinking P 
 ros2 topic hz /ekf/odom                                           # ~50 Hz
 ```
 
-Plot them together: `ros2 run plotjuggler plotjuggler` (install `ros-jazzy-plotjuggler-ros`)
+Plot them together: `ros2 run plotjuggler plotjuggler` (install `ros-humble-plotjuggler-ros`)
 or `ros2 run rqt_plot rqt_plot /ekf/odom/pose/pose/position/x /true_odom/pose/pose/position/x`.
 
 ### Navigation (Stage 3)
@@ -211,13 +214,16 @@ ros2 param get /navigation_pid_node goal_tol
 | `Package 'my_bot_sim' not found` | Forgot `source install/setup.bash` in this terminal. |
 | `executable 'true_pose_gps.py' not found` | Stale build. `rm -rf build install log && colcon build --symlink-install`. |
 | Gazebo opens, no robot | Check the `create` node output; world/model paths come from the installed package share dir. |
-| `/odom/wheels`, `/imu/data` empty | Bridge not running or Gazebo paused (world is started with `-r`). Compare `gz topic -l` with `ros2 topic list`. |
+| `/odom/wheels`, `/imu/data` empty | Bridge not running or Gazebo paused (world is started with `-r`). Compare `ign topic -l` with `ros2 topic list`. |
 | `/true_odom` missing, GPS silent | `true_pose_gps` waits for `/true_odom`. Check the bridge line and the plugin name in `model.sdf`; the error text is in the bridge/Gazebo log. |
 | EKF never prints `GPS origin set` | No `/gnss/fix` (see above). It needs 20 fixes (~4 s at 5 Hz). |
 | Robot ignores goals | `ros2 topic info /goal_pose -v` – is the controller subscribed? Is `/ekf/odom` publishing? |
 | Estimate jumps or drifts | Make sure the robot was still during GPS-origin averaging; check `gps_sigma` equals the noise in `true_pose_gps.py`. |
 | Robot oscillates near goal | Raise `goal_tol` or lower the gains in `navigation_pid_node.py`. |
 | Goal window did not open | Install xterm, or `goal_input:=none` and run `ros2 run ugv_nav goal_pose_node` in another terminal. |
+| `Failed to load system plugin [gz-sim-...]` or a robot that does not move | Plugin names from Garden/Harmonic. In Fortress they must be `ignition-gazebo-*-system` / `ignition::gazebo::systems::*` (already done in this repo's SDF files). |
+| Bridge error `unsupported/unknown type ... gz.msgs` | On Fortress the bridge types are `ignition.msgs.*`. |
+| `ign: command not found` | Fortress not installed: `sudo apt install ros-humble-ros-gz` or install `ignition-fortress` from the OSRF repo. |
 | Stale processes / Gazebo won't restart | `./scripts/kill_sim.sh` |
 | Weird behaviour after editing files | `colcon build --symlink-install --packages-select <pkg>` then re-source. |
 

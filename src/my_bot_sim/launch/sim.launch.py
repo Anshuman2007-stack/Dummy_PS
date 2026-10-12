@@ -48,9 +48,9 @@ def generate_launch_description():
     bridge = Node(
         package='ros_gz_bridge', executable='parameter_bridge', output='screen',
         arguments=[
-            '/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
-            '/model/my_bot/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry',
-            '/imu@sensor_msgs/msg/Imu[gz.msgs.IMU',
+            '/cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist',
+            '/model/my_bot/odometry@nav_msgs/msg/Odometry[ignition.msgs.Odometry',
+            '/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU',
             '/true_odom@nav_msgs/msg/Odometry[ignition.msgs.Odometry',
         ],
         remappings=[
